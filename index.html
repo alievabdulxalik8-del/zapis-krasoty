@@ -331,17 +331,26 @@ function renderDateNav(){
 }
 function pickDate(ds){selDate=ds;renderDateNav();renderSlots()}
 function renderSlots(){
+  var el=document.getElementById('slotGrid');
+  if(info.off&&info.off[selDate]){
+    el.innerHTML='<div class="empty" style="grid-column:1/-1">'+esc(info.master||info.name||'Мастер')+' сегодня отдыхает — загляните в другой день 🌸</div>';
+    document.getElementById('slotHint').textContent='';
+    return;
+  }
   var dur=+selSrv.d||60;
   var dayBusy=busy.filter(function(b){return b.date===selDate});
   var nowMin=(selDate===iso())?(new Date().getHours()*60+new Date().getMinutes()+30):-1;
-  var explicit=(info.slots&&info.slots[selDate])||[];
-  var starts;
-  if(explicit.length){
-    starts=explicit.map(t2m).sort(function(a,b){return a-b});
+  var ranges=(info.ranges&&info.ranges[selDate])||[];
+  var starts=[];
+  if(ranges.length){
+    ranges.forEach(function(r){
+      var from=t2m(r.from),to=t2m(r.to);
+      for(var s0=from;s0+dur<=to;s0+=STEP_MIN)starts.push(s0);
+    });
+    starts.sort(function(a,b){return a-b});
   } else {
     var from=t2m(info.from||'09:00'),to=t2m(info.to||'19:00');
-    starts=[];
-    for(var s0=from;s0+dur<=to;s0+=STEP_MIN)starts.push(s0);
+    for(var s1=from;s1+dur<=to;s1+=STEP_MIN)starts.push(s1);
   }
   var slots=starts.map(function(s){
     var e=s+dur;
@@ -349,7 +358,6 @@ function renderSlots(){
     var past=nowMin>=0&&s<nowMin;
     return {t:s,disabled:clash||past};
   });
-  var el=document.getElementById('slotGrid');
   var free=slots.filter(function(x){return !x.disabled}).length;
   if(!slots.length){el.innerHTML='<div class="empty" style="grid-column:1/-1">Для этой услуги не осталось времени в этот день.</div>';}
   else{
