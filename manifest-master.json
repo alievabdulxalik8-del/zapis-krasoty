@@ -1,0 +1,17 @@
+{
+  "name": "ЗаписьКрасоты · Кабинет мастера",
+  "short_name": "Кабинет мастера",
+  "description": "Кабинет мастера — запись клиентов, услуги и деньги",
+  "start_url": "app.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#F6EDE9",
+  "theme_color": "#8C2F45",
+  "lang": "ru",
+  "icons": [
+    { "src": "icons/icon-192-master.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192-master.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512-master.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-master.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
