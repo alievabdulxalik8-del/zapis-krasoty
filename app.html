@@ -378,6 +378,9 @@ var editVis=null,editSrv=null,page='day',syncing=false,canStore=true,curItems=[]
 
 /* ---------- мелочи ---------- */
 function esc(s){return String(s==null?'':s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+/* Безопасная вставка значения как аргумента-строки внутри onclick="fn('...')":
+   сначала экранируем \ и ' для JS-строки, затем esc() экранирует HTML-атрибут. */
+function attrJs(s){return esc(String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"))}
 function money(n){return (Math.round(n)||0).toLocaleString('ru-RU')}
 function iso(d){var x=d||new Date();return new Date(x.getTime()-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
 function dOnly(s){return String(s==null?'':s).slice(0,10)}
@@ -391,7 +394,7 @@ function byId(a,id){for(var i=0;i<a.length;i++)if(String(a[i].id)===String(id))r
 function touch(r){r.updated=Date.now();r.dirty=1}
 function uid(p){return p+Date.now()+Math.floor(Math.random()*900+100)}
 function phoneKey(p){return String(p||'').replace(/\D/g,'')}
-function waPhone(p){var ph=phoneKey(p);if(ph.length===11&&ph[0]==='8')ph='7'+ph.slice(1);return ph}
+function waPhone(p){var ph=phoneKey(p);if(ph.length===11&&ph[0]==='8')ph='7'+ph.slice(1);else if(ph.length===10)ph='7'+ph;return ph}
 function services(){return (D.config.services||[])}
 function itemsTxt(v){return (v.items||[]).map(function(x){return x.n}).join(', ')}
 
@@ -629,7 +632,7 @@ function today(){document.getElementById('qDate').value=iso();renderDay()}
 function shiftDay(n){var i=document.getElementById('qDate');var d=new Date(i.value||iso());d.setDate(d.getDate()+n);i.value=iso(d);renderDay()}
 function dayList(ds){
   var d=ds||document.getElementById('qDate').value;
-  return live(D.visits).filter(function(c){return dOnly(c.date)===d}).sort(function(a,b){return t2m(a.time)-t2m(b.time)});
+  return live(D.visits).filter(function(c){return dOnly(c.date)===d}).sort(function(a,b){return (a.time?t2m(a.time):1e6)-(b.time?t2m(b.time):1e6)});
 }
 function ruShort(ds){
   var d=new Date(ds+'T00:00:00'),wd=['вс','пн','вт','ср','чт','пт','сб'][d.getDay()];
@@ -788,6 +791,15 @@ function saveVisit(){
     pay:document.getElementById('vPay').value,
     status:editVis?document.getElementById('vStatus').value:'new'};
   if(o.pay!=='В долг')o.paid=1;
+  if(o.time){
+    var s=t2m(o.time),en=s+(o.dur||60);
+    var clash=dayList(o.date).some(function(v){
+      if(String(v.id)===String(editVis)||!v.time)return false;
+      var bs=t2m(v.time),be=bs+(+v.dur||60);
+      return s<be&&bs<en;
+    });
+    if(clash&&!confirm('На это время уже есть запись. Всё равно сохранить?'))return;
+  }
   if(editVis){var c=byId(D.visits,editVis);for(var k in o)c[k]=o[k];touch(c)}
   else{o.id=uid('v');o.deleted=0;o.paid=o.pay==='В долг'?0:1;touch(o);D.visits.push(o)}
   save();close_('m-vis');
@@ -867,7 +879,7 @@ function renderClients(){
   document.getElementById('cliCount').textContent=all.length+' чел.';
   if(!L.length){el.innerHTML='<div class="empty">Пока никого нет.</div>';return}
   el.innerHTML=L.map(function(c){
-    return '<div class="row" onclick="openClient(\''+c.key+'\')" style="cursor:pointer">'+
+    return '<div class="row" onclick="openClient(\''+attrJs(c.key)+'\')" style="cursor:pointer">'+
       '<div class="grow"><div class="nm">'+esc(c.name)+'</div>'+
       '<div class="sub">'+esc(c.phone||'без телефона')+(favSrv(c)?' · '+esc(favSrv(c)):'')+'</div>'+
       '<div class="sub dim">визитов: '+c.visits+' · на '+money(c.spent)+' ₽ · последний '+(ruDate(c.last)||'—')+'</div></div>'+
@@ -924,7 +936,7 @@ function renderRem(){
       '<div class="sub">'+esc(c.srv)+' · была '+ruDate(c.last)+'</div>'+
       '<div class="sub dim">срок повтора: '+ruDate(c.due)+(c.late>0?' · просрочено '+c.late+' дн.':' · на днях')+'</div>'+
       '</div><div class="acts">'+
-      '<button class="b sm pri" onclick="waRemind(\''+esc(c.phone)+'\',\''+esc(c.srv).replace(/'/g,"")+'\')">Написать</button>'+
+      '<button class="b sm pri" onclick="waRemind(\''+attrJs(c.phone)+'\',\''+attrJs(c.srv)+'\')">Написать</button>'+
       '</div></div>';
   }).join('');
 }

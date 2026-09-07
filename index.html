@@ -168,7 +168,10 @@ var DEVICE_CAP=5;
 var STEP_MIN=30; // шаг сетки слотов, минут
 var info={},busy=[],selSrv=null,selDate='',selTime='',submitting=false;
 
-function esc(s){return String(s==null?'':s).replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c]})}
+function esc(s){return String(s==null?'':s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+/* Безопасная вставка значения как аргумента-строки внутри onclick="fn('...')":
+   сначала экранируем \ и ' для JS-строки, затем esc() экранирует HTML-атрибут. */
+function attrJs(s){return esc(String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"))}
 function iso(d){var x=d||new Date();return new Date(x.getTime()-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
 function uid(){return 'w'+Date.now()+Math.floor(Math.random()*900+100)}
 function t2m(t){var p=String(t||'').split(':');return p.length===2?(+p[0])*60+(+p[1]):0}
@@ -221,7 +224,7 @@ function renderPickerList(){
   if(!allShops.length){el.innerHTML='<div class="empty">Пока нет ни одной студии</div>';return}
   if(!L.length){el.innerHTML='<div class="empty">В этом селе пока никого нет</div>';return}
   el.innerHTML=L.map(function(s){
-    return '<div class="row" style="cursor:pointer" onclick="chooseShop(\''+esc(s.id)+'\')">'+
+    return '<div class="row" style="cursor:pointer" onclick="chooseShop(\''+attrJs(s.id)+'\')">'+
       '<div style="flex:1"><div class="nm">'+esc(s.name||s.id)+'</div>'+
       '<div class="dim">'+esc(s.spec||'')+(s.village?' · '+esc(s.village):'')+(s.hours?' · '+esc(s.hours):'')+'</div></div>'+
       '<div style="color:var(--ink-3)">›</div></div>';
