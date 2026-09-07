@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ЗаписьКрасоты — онлайн-запись к мастеру</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Infant:wght@600;700&family=Manrope:wght@400;500;700;800&display=swap">
+<style>
+:root{
+  --ink:#2E1F26;--ink-2:#6B4F58;--ink-3:#9C838A;
+  --paper:#F6EDE9;--card:#FFFFFF;--line:#E9D9D9;
+  --acc:#8C2F45;--acc-bg:#F5DFE3;
+  --grn:#3F7355;--grn-bg:#E1EFE6;
+  --red:#A33B3B;--red-bg:#F8E4E4;
+  --r:14px;--disp:'Cormorant Infant',Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.5}
+.wrap{max-width:480px;margin:0 auto;padding:22px 16px 48px}
+h1{font-family:var(--disp);font-size:28px;font-weight:600;line-height:1.15;margin-bottom:3px}
+.sub{color:var(--ink-2);font-size:14px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.pad{padding:18px}
+.hd{padding:13px 18px;font-size:12px;font-weight:800;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.nm{font-weight:700;font-size:15px}
+.dim{color:var(--ink-2);font-size:13px;margin-top:1px}
+.empty{padding:24px 18px;text-align:center;color:var(--ink-3);font-size:14px}
+label{display:block;font-size:12px;font-weight:800;color:var(--ink-2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em}
+input,textarea{width:100%;font:inherit;font-size:16px;padding:12px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:13px;background:var(--card);color:var(--ink)}
+input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px;border-color:var(--acc)}
+button{width:100%;font:inherit;font-size:16px;font-weight:700;padding:14px;border-radius:12px;border:none;background:var(--acc);color:#fff;cursor:pointer}
+button:disabled{opacity:.5}
+button.ghost{background:none;color:var(--acc);font-weight:700;text-decoration:underline;padding:8px;width:auto}
+.err{color:var(--red);font-size:13px;margin-bottom:10px;display:none;font-weight:600}
+.done{text-align:center;padding:10px 6px}
+.done .ico{width:64px;height:64px;border-radius:50%;background:var(--grn-bg);color:var(--grn);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.done .ico svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.2}
+.done h2{font-family:var(--disp);font-size:22px;font-weight:600;margin-bottom:5px}
+.done p{color:var(--ink-2);font-size:14px}
+.vchips{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 14px;-webkit-overflow-scrolling:touch}
+.vchip{flex:0 0 auto;font-size:13px;font-weight:700;padding:7px 14px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.vchip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.steps{display:flex;gap:6px;margin-bottom:16px}
+.steps span{flex:1;height:3px;border-radius:3px;background:var(--line)}
+.steps span.on{background:var(--acc)}
+.step-lbl{font-size:12px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.srvbox{display:flex;flex-direction:column;gap:8px}
+.srv{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:var(--card)}
+.srv.on{border-color:var(--acc);background:var(--acc-bg)}
+.srv .rd{width:19px;height:19px;border-radius:50%;border:2px solid var(--line);flex:0 0 19px;position:relative}
+.srv.on .rd{border-color:var(--acc)}
+.srv.on .rd::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--acc)}
+.srv .body{flex:1;min-width:0}
+.srv .n{font-weight:700;font-size:14.5px}
+.srv .d{font-size:12.5px;color:var(--ink-2);margin-top:1px}
+.srv .p{font-weight:800;font-size:14.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dnav{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 4px;-webkit-overflow-scrolling:touch;margin-bottom:14px}
+.dchip{flex:0 0 auto;min-width:58px;text-align:center;padding:9px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.dchip.on{background:var(--acc);border-color:var(--acc)}
+.dchip.on *{color:#fff!important}
+.dchip .a{font-weight:700;font-size:13px}
+.dchip .b{font-size:10px;color:var(--ink-2);margin-top:1px}
+.slotgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{padding:11px 4px;text-align:center;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;cursor:pointer}
+.slot.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.slot[disabled]{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.mine{background:var(--acc-bg);border-color:var(--acc)}
+.mine .pill{background:var(--acc);color:#fff}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--grn-bg);color:var(--grn);margin-top:6px}
+.backlink{margin-bottom:12px;display:inline-block;color:var(--acc);text-decoration:none;font-weight:700;font-size:13px}
+.info{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;padding:13px 18px}
+.info svg{flex:0 0 18px;margin-top:2px;stroke:var(--acc);fill:none;stroke-width:1.8}
+.info a{color:var(--acc);text-decoration:none;font-weight:700}
+.change{font-size:12.5px;color:var(--acc);font-weight:700;cursor:pointer;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- КАТАЛОГ МАСТЕРОВ -->
+<div id="pickerView" style="display:none">
+  <h1>ЗаписьКрасоты</h1>
+  <div class="sub">выберите мастера, к которому хотите записаться</div>
+  <div class="vchips" id="villageChips"></div>
+  <div class="card"><div id="pickerList"></div></div>
+</div>
+
+<!-- СТРАНИЦА МАСТЕРА -->
+<div id="shopView" style="display:none">
+  <a href="javascript:void(0)" class="backlink" id="backToPicker" style="display:none" onclick="goToPicker()">← все мастера</a>
+  <h1 id="shopName">Студия</h1>
+  <div class="sub" id="shopSub">запись онлайн</div>
+
+  <div class="card"><div class="info" id="infoBlock"></div></div>
+
+  <!-- уже есть записи с этого устройства -->
+  <div class="card" id="mineCard" style="display:none">
+    <div class="hd">Ваши записи здесь</div>
+    <div id="mineList"></div>
+  </div>
+
+  <!-- ШАГ 1: услуга -->
+  <div class="card" id="stepSrv">
+    <div class="pad">
+      <div class="steps"><span class="on"></span><span></span><span></span></div>
+      <div class="step-lbl">Шаг 1 · что делаем</div>
+      <div class="srvbox" id="srvBox"></div>
+    </div>
+  </div>
+
+  <!-- ШАГ 2: дата и время -->
+  <div class="card" id="stepTime" style="display:none">
+    <div class="pad">
+      <div class="steps"><span class="on"></span><span class="on"></span><span></span></div>
+      <div class="step-lbl">Шаг 2 · когда удобно</div>
+      <p style="font-size:13px;color:var(--ink-2);margin:-2px 0 12px">
+        <span id="chosenSrvTxt"></span> · <span class="change" onclick="backToSrv()">изменить</span>
+      </p>
+      <div class="err" id="timeErr"></div>
+      <div class="dnav" id="dateNav"></div>
+      <div class="slotgrid" id="slotGrid"></div>
+      <p class="dim" id="slotHint" style="margin-top:12px"></p>
+    </div>
+  </div>
+
+  <!-- ШАГ 3: контакты -->
+  <div class="card" id="stepForm" style="display:none">
+    <div class="pad">
+      <div class="steps"><span class="on"></span><span class="on"></span><span class="on"></span></div>
+      <div class="step-lbl">Шаг 3 · ваши данные</div>
+      <p style="font-size:13px;color:var(--ink-2);margin:-2px 0 12px">
+        <span id="chosenAllTxt"></span> · <span class="change" onclick="backToTime()">изменить время</span>
+      </p>
+      <div class="err" id="err"></div>
+      <input id="name" placeholder="Ваше имя">
+      <input id="phone" type="tel" inputmode="tel" placeholder="Телефон (WhatsApp)">
+      <textarea id="note" rows="2" placeholder="Пожелание: цвет, форма, дизайн (необязательно)"></textarea>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px">
+        <input type="checkbox" id="agree" style="width:auto;margin-top:3px">
+        <label style="font-weight:400;font-size:13px;color:var(--ink-2);margin-bottom:0;text-transform:none;letter-spacing:0">Согласна с <a href="privacy.html" target="_blank" style="color:var(--acc)">политикой конфиденциальности</a></label>
+      </div>
+      <button id="submitBtn" onclick="submitForm()">Записаться</button>
+    </div>
+  </div>
+
+  <!-- ГОТОВО -->
+  <div class="card" id="doneCard" style="display:none">
+    <div class="pad done">
+      <div class="ico"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+      <h2>Вы записаны</h2>
+      <p id="doneTxt"></p>
+      <p style="font-size:12.5px;color:var(--ink-3);margin-top:10px;line-height:1.4">Если что-то изменится — мастер напишет вам в WhatsApp по указанному телефону.</p>
+      <button class="ghost" style="margin-top:12px" onclick="bookAnother()">Записаться ещё на визит</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var BASE_URL='https://dsmdmjpavpdxnmwprhng.supabase.co/functions/v1/sync';
+var SHOP=new URLSearchParams(location.search).get('m')||'';
+var LKEY='beauty_bookings_v1'+(SHOP?'_'+SHOP:'');
+var DEVICE_CAP=5;
+var STEP_MIN=30; // шаг сетки слотов, минут
+var info={},busy=[],selSrv=null,selDate='',selTime='',submitting=false;
+
+function esc(s){return String(s==null?'':s).replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c]})}
+function iso(d){var x=d||new Date();return new Date(x.getTime()-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+function uid(){return 'w'+Date.now()+Math.floor(Math.random()*900+100)}
+function t2m(t){var p=String(t||'').split(':');return p.length===2?(+p[0])*60+(+p[1]):0}
+function m2t(m){m=Math.max(0,Math.round(m));return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2)}
+function money(n){return (Math.round(n)||0).toLocaleString('ru-RU')}
+function durTxt(m){m=+m||0;var h=Math.floor(m/60),r=m%60;return (h?h+' ч':'')+(h&&r?' ':'')+(r?r+' мин':'')||'—'}
+
+var MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+var WD=['вс','пн','вт','ср','чт','пт','сб'];
+function ruDate(ds){
+  var t=iso(),tm=iso(new Date(Date.now()+864e5));
+  if(ds===t)return 'сегодня';
+  if(ds===tm)return 'завтра';
+  var d=new Date(ds+'T00:00:00');
+  return d.getDate()+' '+MONTHS[d.getMonth()];
+}
+function ruDateFull(ds){
+  var d=new Date(ds+'T00:00:00');
+  return d.getDate()+' '+MONTHS[d.getMonth()]+' ('+WD[d.getDay()]+')';
+}
+
+/* ---------- каталог мастеров ---------- */
+function goToPicker(){var u=new URL(location.href);u.searchParams.delete('m');location.href=u.toString()}
+var allShops=[],villageFilter='';
+function loadPicker(){
+  document.getElementById('pickerView').style.display='block';
+  document.getElementById('shopView').style.display='none';
+  var el=document.getElementById('pickerList');
+  el.innerHTML='<div class="empty">Загрузка…</div>';
+  fetch(BASE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({listShops:true})})
+    .then(function(r){return r.json()})
+    .then(function(res){allShops=(res&&res.shops)||[];renderVillageChips();renderPickerList()})
+    .catch(function(){el.innerHTML='<div class="empty">Не удалось загрузить список</div>'});
+}
+function renderVillageChips(){
+  var villages=[];
+  allShops.forEach(function(s){var v=(s.village||'').trim();if(v&&villages.indexOf(v)<0)villages.push(v)});
+  villages.sort(function(a,b){return a.localeCompare(b,'ru')});
+  var box=document.getElementById('villageChips');
+  if(!villages.length){box.innerHTML='';return}
+  var chips=[['','Все сёла']].concat(villages.map(function(v){return [v,v]}));
+  box.innerHTML=chips.map(function(c){
+    return '<div class="vchip'+(villageFilter===c[0]?' on':'')+'" onclick="setVillageFilter(\''+esc(c[0]).replace(/'/g,"\\'")+'\')">'+esc(c[1])+'</div>';
+  }).join('');
+}
+function setVillageFilter(v){villageFilter=v;renderVillageChips();renderPickerList()}
+function renderPickerList(){
+  var el=document.getElementById('pickerList');
+  var L=allShops.filter(function(s){return !villageFilter||(s.village||'').trim()===villageFilter});
+  if(!allShops.length){el.innerHTML='<div class="empty">Пока нет ни одной студии</div>';return}
+  if(!L.length){el.innerHTML='<div class="empty">В этом селе пока никого нет</div>';return}
+  el.innerHTML=L.map(function(s){
+    return '<div class="row" style="cursor:pointer" onclick="chooseShop(\''+esc(s.id)+'\')">'+
+      '<div style="flex:1"><div class="nm">'+esc(s.name||s.id)+'</div>'+
+      '<div class="dim">'+esc(s.spec||'')+(s.village?' · '+esc(s.village):'')+(s.hours?' · '+esc(s.hours):'')+'</div></div>'+
+      '<div style="color:var(--ink-3)">›</div></div>';
+  }).join('');
+}
+function chooseShop(id){var u=new URL(location.href);u.searchParams.set('m',id);location.href=u.toString()}
+
+/* ---------- локальное хранилище своих записей ---------- */
+function myBookings(){try{return JSON.parse(localStorage.getItem(LKEY)||'[]')}catch(e){return []}}
+function saveMine(a){try{localStorage.setItem(LKEY,JSON.stringify(a))}catch(e){}}
+function addMine(rec){var a=myBookings();a.push(rec);saveMine(a)}
+function dropMine(id){saveMine(myBookings().filter(function(b){return b.id!==id}))}
+
+/* ---------- загрузка страницы мастера ---------- */
+function loadShop(){
+  if(!BASE_URL||BASE_URL.indexOf('http')!==0){
+    document.getElementById('infoBlock').innerHTML='<div>Страница не подключена к базе</div>';return;
+  }
+  fetch(BASE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({board:true,shop:SHOP})})
+    .then(function(r){return r.json()})
+    .then(function(res){
+      if(!res||!res.ok){document.getElementById('infoBlock').innerHTML='<div>'+esc((res&&res.error)||'Мастер не найден')+'</div>';return}
+      info=res.info||{};busy=res.busy||[];
+      renderShopHeader();renderMine();renderServices();
+    })
+    .catch(function(){document.getElementById('infoBlock').innerHTML='<div>Нет связи. Проверьте интернет.</div>'});
+}
+function renderShopHeader(){
+  document.getElementById('shopName').textContent=info.name||'Студия';
+  document.getElementById('shopSub').textContent=info.spec||'запись онлайн';
+  var h='';
+  if(info.hours)h+='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>Часы работы</b><br>'+esc(info.hours)+'</div>';
+  if(info.phone)h+='</div><div class="info" style="border-top:1px solid var(--line)"><svg viewBox="0 0 24 24"><path d="M4 5c0 8 7 15 15 15l3-4-6-2-2 2c-3-1-6-4-7-7l2-2-2-6z"/></svg><div><b>Телефон</b><br><a href="tel:'+esc(info.phone)+'">'+esc(info.phone)+'</a></div>';
+  document.getElementById('infoBlock').innerHTML=h||'<div>Добро пожаловать! Запишитесь ниже.</div>';
+}
+function renderMine(){
+  var mine=myBookings(),busyIds={};
+  busy.forEach(function(b){busyIds[b.id]=b});
+  mine=mine.filter(function(b){return !!busyIds[b.id]});
+  saveMine(mine);
+  var card=document.getElementById('mineCard'),list=document.getElementById('mineList');
+  if(!mine.length){card.style.display='none';return}
+  card.style.display='block';
+  mine.sort(function(a,b){return (a.date+a.time)>(b.date+b.time)?1:-1});
+  list.innerHTML=mine.map(function(b){
+    return '<div class="row"><div style="flex:1"><div class="nm">'+ruDateFull(b.date)+', в '+esc(b.time)+'</div>'+
+      '<div class="dim">'+esc(b.srv||'')+'</div><span class="pill">запись подтверждена</span></div></div>';
+  }).join('');
+}
+
+/* ---------- шаг 1: услуги ---------- */
+function renderServices(){
+  var L=info.services||[];
+  var box=document.getElementById('srvBox');
+  if(!L.length){
+    box.innerHTML='<div class="empty">Мастер пока не заполнил прайс. Позвоните напрямую: '+
+      (info.phone?'<a href="tel:'+esc(info.phone)+'" style="color:var(--acc)">'+esc(info.phone)+'</a>':'см. выше')+'.</div>';
+    return;
+  }
+  box.innerHTML=L.map(function(x,i){
+    return '<div class="srv" id="srv-'+i+'" onclick="pickSrv('+i+')"><div class="rd"></div>'+
+      '<div class="body"><div class="n">'+esc(x.n)+'</div><div class="d">'+durTxt(x.d)+'</div></div>'+
+      '<div class="p">'+money(x.p)+' ₽</div></div>';
+  }).join('');
+}
+function pickSrv(i){
+  selSrv=(info.services||[])[i];if(!selSrv)return;
+  document.querySelectorAll('.srv').forEach(function(e){e.classList.remove('on')});
+  document.getElementById('srv-'+i).classList.add('on');
+  setTimeout(function(){goToTime()},180);
+}
+function backToSrv(){
+  document.getElementById('stepSrv').style.display='block';
+  document.getElementById('stepTime').style.display='none';
+  document.getElementById('stepForm').style.display='none';
+}
+/* ---------- шаг 2: дата и время ---------- */
+function goToTime(){
+  document.getElementById('stepSrv').style.display='none';
+  document.getElementById('stepForm').style.display='none';
+  document.getElementById('stepTime').style.display='block';
+  document.getElementById('timeErr').style.display='none';
+  document.getElementById('chosenSrvTxt').textContent=selSrv.n+' · '+durTxt(selSrv.d)+' · '+money(selSrv.p)+' ₽';
+  renderDateNav();
+  if(!selDate)selDate=iso();
+  renderSlots();
+}
+function renderDateNav(){
+  var el=document.getElementById('dateNav'),html='',base=new Date();
+  if(!selDate)selDate=iso();
+  for(var i=0;i<14;i++){
+    var d=new Date(base.getFullYear(),base.getMonth(),base.getDate()+i),ds=iso(d);
+    var lbl=ds===iso()?'Сегодня':ds===iso(new Date(Date.now()+864e5))?'Завтра':WD[d.getDay()];
+    html+='<div class="dchip'+(ds===selDate?' on':'')+'" onclick="pickDate(\''+ds+'\')"><div class="a">'+lbl+'</div><div class="b">'+d.getDate()+'.'+('0'+(d.getMonth()+1)).slice(-2)+'</div></div>';
+  }
+  el.innerHTML=html;
+}
+function pickDate(ds){selDate=ds;renderDateNav();renderSlots()}
+function renderSlots(){
+  var from=t2m(info.from||'09:00'),to=t2m(info.to||'19:00'),dur=+selSrv.d||60;
+  var dayBusy=busy.filter(function(b){return b.date===selDate});
+  var nowMin=(selDate===iso())?(new Date().getHours()*60+new Date().getMinutes()+30):-1;
+  var slots=[],s=from;
+  while(s+dur<=to){
+    var e=s+dur;
+    var clash=dayBusy.some(function(b){var bs=t2m(b.time),be=bs+(+b.dur||60);return s<be&&bs<e});
+    var past=nowMin>=0&&s<nowMin;
+    slots.push({t:s,disabled:clash||past});
+    s+=STEP_MIN;
+  }
+  var el=document.getElementById('slotGrid');
+  var free=slots.filter(function(x){return !x.disabled}).length;
+  if(!slots.length){el.innerHTML='<div class="empty" style="grid-column:1/-1">Для этой услуги не осталось времени в этот день.</div>';}
+  else{
+    el.innerHTML=slots.map(function(x){
+      var tt=m2t(x.t);
+      return '<button type="button" class="slot'+(tt===selTime&&selDate?' on':'')+'"'+(x.disabled?' disabled':'')+' onclick="pickTime(\''+tt+'\')">'+tt+'</button>';
+    }).join('');
+  }
+  document.getElementById('slotHint').textContent=free?('свободно слотов: '+free):'на этот день свободных мест не осталось — выберите другую дату';
+}
+function pickTime(t){
+  selTime=t;
+  document.querySelectorAll('.slot').forEach(function(e){e.classList.remove('on')});
+  var btns=document.querySelectorAll('.slot');
+  for(var i=0;i<btns.length;i++)if(btns[i].textContent===t)btns[i].classList.add('on');
+  setTimeout(function(){goToForm()},160);
+}
+function backToTime(){
+  document.getElementById('stepTime').style.display='block';
+  document.getElementById('stepForm').style.display='none';
+  document.getElementById('timeErr').style.display='none';
+}
+/* ---------- шаг 3: контакты ---------- */
+function goToForm(){
+  document.getElementById('stepTime').style.display='none';
+  document.getElementById('stepForm').style.display='block';
+  document.getElementById('chosenAllTxt').textContent=selSrv.n+' · '+ruDateFull(selDate)+', в '+selTime;
+  document.getElementById('err').style.display='none';
+}
+function submitForm(){
+  if(submitting)return;
+  var name=document.getElementById('name').value.trim();
+  var phone=document.getElementById('phone').value.trim();
+  var err=document.getElementById('err');
+  if(!name||!phone){err.textContent='Заполните имя и телефон.';err.style.display='block';return}
+  if(!document.getElementById('agree').checked){err.textContent='Нужно принять политику конфиденциальности.';err.style.display='block';return}
+  if(myBookings().length>=DEVICE_CAP){err.textContent='С этого устройства уже много активных записей. Свяжитесь с мастером напрямую.';err.style.display='block';return}
+  err.style.display='none';
+  submitting=true;
+  var btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Записываем…';
+  var visit={id:uid(),name:name,phone:phone,date:selDate,time:selTime,dur:selSrv.d,
+    items:[{n:selSrv.n,p:selSrv.p,d:selSrv.d,w:selSrv.w||0}],total:selSrv.p,
+    note:document.getElementById('note').value.trim()};
+  fetch(BASE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({board:true,shop:SHOP,visit:visit})})
+    .then(function(r){return r.json()})
+    .then(function(res){
+      submitting=false;btn.disabled=false;btn.textContent='Записаться';
+      if(!res||!res.ok){
+        if(res&&res.busy){
+          busy=res.busy;selTime='';
+          backToTime();renderSlots();
+          var te=document.getElementById('timeErr');
+          te.textContent=(res.error||'Это время только что заняли — выберите другое.');te.style.display='block';
+          return;
+        }
+        err.textContent=(res&&res.error)||'Не удалось отправить. Попробуйте ещё раз.';err.style.display='block';
+        return;
+      }
+      busy=res.busy||busy;
+      addMine({id:res.id||visit.id,date:selDate,time:selTime,srv:selSrv.n});
+      document.getElementById('doneTxt').textContent=(info.name||'Мастер')+' ждёт вас '+ruDateFull(selDate)+' в '+selTime+' — '+selSrv.n+', '+money(selSrv.p)+' ₽.';
+      document.getElementById('stepForm').style.display='none';
+      document.getElementById('doneCard').style.display='block';
+      renderMine();
+    })
+    .catch(function(){
+      submitting=false;btn.disabled=false;btn.textContent='Записаться';
+      err.textContent='Нет связи с сервером. Проверьте интернет.';err.style.display='block';
+    });
+}
+function bookAnother(){
+  document.getElementById('doneCard').style.display='none';
+  document.getElementById('name').value='';document.getElementById('phone').value='';document.getElementById('note').value='';
+  selSrv=null;selTime='';
+  document.querySelectorAll('.srv').forEach(function(e){e.classList.remove('on')});
+  document.getElementById('stepSrv').style.display='block';
+  loadShop();
+}
+
+/* ---------- запуск ---------- */
+if(SHOP){
+  document.getElementById('backToPicker').style.display='inline-block';
+  document.getElementById('shopView').style.display='block';
+  loadShop();
+}else{
+  loadPicker();
+}
+</script>
+</body>
+</html>
