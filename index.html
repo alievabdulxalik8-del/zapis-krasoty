@@ -331,17 +331,24 @@ function renderDateNav(){
 }
 function pickDate(ds){selDate=ds;renderDateNav();renderSlots()}
 function renderSlots(){
-  var from=t2m(info.from||'09:00'),to=t2m(info.to||'19:00'),dur=+selSrv.d||60;
+  var dur=+selSrv.d||60;
   var dayBusy=busy.filter(function(b){return b.date===selDate});
   var nowMin=(selDate===iso())?(new Date().getHours()*60+new Date().getMinutes()+30):-1;
-  var slots=[],s=from;
-  while(s+dur<=to){
+  var explicit=(info.slots&&info.slots[selDate])||[];
+  var starts;
+  if(explicit.length){
+    starts=explicit.map(t2m).sort(function(a,b){return a-b});
+  } else {
+    var from=t2m(info.from||'09:00'),to=t2m(info.to||'19:00');
+    starts=[];
+    for(var s0=from;s0+dur<=to;s0+=STEP_MIN)starts.push(s0);
+  }
+  var slots=starts.map(function(s){
     var e=s+dur;
     var clash=dayBusy.some(function(b){var bs=t2m(b.time),be=bs+(+b.dur||60);return s<be&&bs<e});
     var past=nowMin>=0&&s<nowMin;
-    slots.push({t:s,disabled:clash||past});
-    s+=STEP_MIN;
-  }
+    return {t:s,disabled:clash||past};
+  });
   var el=document.getElementById('slotGrid');
   var free=slots.filter(function(x){return !x.disabled}).length;
   if(!slots.length){el.innerHTML='<div class="empty" style="grid-column:1/-1">Для этой услуги не осталось времени в этот день.</div>';}

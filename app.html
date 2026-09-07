@@ -167,7 +167,7 @@ label{display:block;font-size:12px;font-weight:700;color:var(--ink-2);margin-bot
   <p>Запись клиентов по времени, база клиентов, прайс и деньги. Один аккаунт — один кабинет, данные не пересекаются с другими мастерами.</p>
   <div class="card pad">
     <button class="b pri" style="width:100%;margin-bottom:8px" onclick="showAuth('login')">Войти</button>
-    <button class="b" style="width:100%" onclick="showAuth('register')">У меня ещё нет аккаунта — зарегистрироваться</button>
+    <button class="b" style="width:100%" onclick="showAuth('register')">Зарегистрироваться</button>
   </div>
 </div>
 
@@ -226,6 +226,17 @@ label{display:block;font-size:12px;font-weight:700;color:var(--ink-2);margin-bot
       <button class="b pri" onclick="openVisit()">+ Записать</button>
     </div>
     <div id="daysStrip" style="display:flex;gap:6px;overflow-x:auto;padding:2px 2px 12px;-webkit-overflow-scrolling:touch"></div>
+    <div class="card pad" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <label style="margin-bottom:0">Окна на этот день</label>
+        <span class="dim" style="font-size:12px;margin-left:auto" id="slotsHint"></span>
+      </div>
+      <div id="slotsChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px">
+        <input type="time" id="newSlotTime">
+        <button class="b pri sm" onclick="addDaySlot()" style="flex:0 0 auto">+ Добавить</button>
+      </div>
+    </div>
     <div class="card" id="dayList"></div>
     <div class="stats" id="dayStats"></div>
   </div>
@@ -305,6 +316,7 @@ label{display:block;font-size:12px;font-weight:700;color:var(--ink-2);margin-bot
         <div class="f"><label>Начало дня</label><input id="sFrom" type="time"></div>
         <div class="f"><label>Конец дня</label><input id="sTo" type="time"></div>
       </div>
+      <p style="font-size:12px;color:var(--ink-2);margin:-4px 0 11px">Это общий запасной график. Если на вкладке «День» выставлены конкретные окна — клиенты увидят именно их, а не этот диапазон.</p>
       <button class="b pri" onclick="saveConfig()">Сохранить</button>
     </div>
     <div class="card pad" style="margin-top:12px">
@@ -342,7 +354,7 @@ label{display:block;font-size:12px;font-weight:700;color:var(--ink-2);margin-bot
   </div>
 </div>
 
-<button class="fab" id="fab" style="display:none" onclick="openVisit()" aria-label="Записать">+</button>
+<button class="fab" id="fab" style="display:none" onclick="fabAdd()" aria-label="Добавить">+</button>
 
 <nav id="nav" style="display:none">
   <button class="on" onclick="go('day')"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5"/></svg>День</button>
@@ -442,6 +454,7 @@ function hhmm(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.
 function t2m(t){var p=String(t||'').split(':');return p.length===2?(+p[0])*60+(+p[1]):0}
 function m2t(m){m=Math.max(0,Math.round(m));return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2)}
 function durTxt(m){m=+m||0;var h=Math.floor(m/60),r=m%60;return (h?h+' ч':'')+(h&&r?' ':'')+(r?r+' мин':'')||'—'}
+function plural(n,one,few,many){n=Math.abs(n)%100;var n1=n%10;if(n>10&&n<20)return many;if(n1===1)return one;if(n1>1&&n1<5)return few;return many}
 function live(a){return a.filter(function(x){return !Number(x.deleted)})}
 function byId(a,id){for(var i=0;i<a.length;i++)if(String(a[i].id)===String(id))return a[i];return null}
 function touch(r){r.updated=Date.now();r.dirty=1}
@@ -668,9 +681,10 @@ function go(p){
   if(p==='rem')renderRem();
   if(p==='story')renderStory();
   if(p==='more')renderMore();
-  document.getElementById('fab').style.display=(p==='day')?'':'none';
+  document.getElementById('fab').style.display=(p==='day'||p==='srv')?'':'none';
   window.scrollTo(0,0);
 }
+function fabAdd(){page==='srv'?openSrv():openVisit()}
 function open_(id){document.getElementById(id).classList.add('on')}
 function close_(id){document.getElementById(id).classList.remove('on')}
 function renderMore(){
@@ -692,6 +706,13 @@ function dayList(ds){
 }
 /* Свободные окна в рабочем дне: рабочие часы минус занятые визитом интервалы. */
 function freeWindows(ds){
+  var explicit=daySlots(ds).slice().sort();
+  if(explicit.length){
+    var busyTimes={};
+    dayList(ds).forEach(function(v){if(v.time)busyTimes[v.time]=true});
+    return explicit.filter(function(t){return !busyTimes[t]})
+      .map(function(t){return {s:t2m(t),e:t2m(t),label:t}});
+  }
   var from=t2m(D.config.from||'09:00'),to=t2m(D.config.to||'19:00');
   var busy=dayList(ds).filter(function(v){return v.status!=='no'&&v.time})
     .map(function(v){var s=t2m(v.time);return {s:s,e:s+(+v.dur||60)}})
@@ -703,7 +724,7 @@ function freeWindows(ds){
     cur=Math.max(cur,e);
   });
   if(cur<to)out.push({s:cur,e:to});
-  return out.filter(function(w){return w.e-w.s>=15});
+  return out.filter(function(w){return w.e-w.s>=15}).map(function(w){return {s:w.s,e:w.e,label:m2t(w.s)+' – '+m2t(w.e)}});
 }
 function ruShort(ds){
   var d=new Date(ds+'T00:00:00'),wd=['вс','пн','вт','ср','чт','пт','сб'][d.getDay()];
@@ -727,8 +748,42 @@ function statusPill(s){
   var cl={new:'p-new',here:'p-here',done:'p-done',no:'p-no'};
   return '<span class="pill '+(cl[s]||'p-new')+'">'+(lbl[s]||'Записана')+'</span>';
 }
+/* Окна, которые мастер сама выставляет на конкретный день — вместо общего «от и до». */
+function daySlots(ds){return (D.config.slots&&D.config.slots[ds])||[]}
+function setDaySlots(ds,arr){
+  D.config.slots=D.config.slots||{};
+  D.config.slots[ds]=arr.slice().sort();
+  D.cfgUpd=Date.now();D.cfgDirty=1;
+}
+function renderSlotsCard(){
+  var ds=document.getElementById('qDate').value||iso();
+  var L=daySlots(ds).slice().sort();
+  var busyTimes={};
+  dayList(ds).forEach(function(v){if(v.time)busyTimes[v.time]=true});
+  var el=document.getElementById('slotsChips');
+  el.innerHTML=L.length?L.map(function(t){
+    var taken=!!busyTimes[t];
+    return '<span class="chip'+(taken?' on':'')+'" style="cursor:default">'+esc(t)+(taken?' · занято':
+      ' <b onclick="removeDaySlot(\''+t+'\')" style="cursor:pointer;margin-left:2px">×</b>')+'</span>';
+  }).join(''):'<span class="dim" style="font-size:13px">Окна не выставлены — клиенты увидят обычные часы работы из Настроек.</span>';
+  document.getElementById('slotsHint').textContent=L.length?L.length+' '+plural(L.length,'окно','окна','окон'):'';
+}
+function addDaySlot(){
+  var i=document.getElementById('newSlotTime'),t=i.value;
+  if(!t){flash('Укажите время',true);return}
+  var ds=document.getElementById('qDate').value||iso();
+  var L=daySlots(ds).slice();
+  if(L.indexOf(t)<0){L.push(t);setDaySlots(ds,L);save();renderSlotsCard();}
+  i.value='';
+}
+function removeDaySlot(t){
+  var ds=document.getElementById('qDate').value||iso();
+  setDaySlots(ds,daySlots(ds).filter(function(x){return x!==t}));
+  save();renderSlotsCard();
+}
 function renderDay(){
   renderDaysStrip();
+  renderSlotsCard();
   var L=dayList(),el=document.getElementById('dayList'),st=document.getElementById('dayStats');
   var from=t2m(D.config.from||'09:00'),to=t2m(D.config.to||'19:00');
   var html='',cursor=from,ds=document.getElementById('qDate').value;
@@ -1029,8 +1084,8 @@ function renderStory(){
   var initial=(s.name||'С').trim().charAt(0).toUpperCase()||'С';
   var windows=freeWindows(ds),shown=windows.slice(0,6),extra=windows.length-shown.length;
   var slotsHtml=shown.length
-    ? shown.map(function(w){return '<div class="story-slot"><span>'+m2t(w.s)+' – '+m2t(w.e)+'</span><span>✦ окно</span></div>'}).join('')
-      +(extra>0?'<div class="story-more">и ещё '+extra+' '+(extra===1?'окно':'окна')+'…</div>':'')
+    ? shown.map(function(w){return '<div class="story-slot"><span>'+esc(w.label)+'</span><span>✦ окно</span></div>'}).join('')
+      +(extra>0?'<div class="story-more">и ещё '+extra+' '+plural(extra,'окно','окна','окон')+'…</div>':'')
     : '<div class="story-empty">Свободных окошек нет — все места разобрали ✿<br>Следите за обновлениями!</div>';
   card.innerHTML=
     '<div class="story-deco-a"></div><div class="story-deco-b"></div>'+
