@@ -208,7 +208,6 @@ label{display:block;font-size:12px;font-weight:700;color:var(--ink-2);margin-bot
     <div class="bar"><h2>Услуги и цены</h2><button class="b pri" onclick="openSrv()">+ Услуга</button></div>
     <p style="font-size:13px;color:var(--ink-2);margin-bottom:12px">Длительность подставляется в запись, а «повтор» — это через сколько недель напомнить клиенту о коррекции.</p>
     <div class="card" id="srvList"></div>
-    <button class="b" style="width:100%;margin-top:12px" onclick="seedSrv()">Загрузить типовой прайс</button>
   </div>
 
   <!-- ЕЩЁ -->
@@ -454,7 +453,7 @@ function finishSetup(){
     spec:document.getElementById('stSpec').value.trim(),
     phone:document.getElementById('stPhone').value.trim(),
     hours:document.getElementById('stHours').value.trim(),
-    from:'09:00',to:'19:00',services:defaultSrv()};
+    from:'09:00',to:'19:00',services:[]};
   fetch(DEPLOY_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({register:true,login:shop,pass:pass,config:[{id:'config',value:cfg,updated:Date.now()}]})})
     .then(function(r){return r.json()})
     .then(function(res){
@@ -801,26 +800,9 @@ function delVisit(){
 }
 
 /* ---------- услуги ---------- */
-function defaultSrv(){
-  return [
-    {n:'Маникюр + гель-лак',d:90,p:1200,w:3},
-    {n:'Маникюр без покрытия',d:45,p:600,w:3},
-    {n:'Снятие покрытия',d:20,p:200,w:0},
-    {n:'Педикюр аппаратный',d:75,p:1500,w:5},
-    {n:'Коррекция бровей',d:30,p:400,w:3},
-    {n:'Брови: коррекция + окрашивание',d:45,p:700,w:4},
-    {n:'Наращивание ресниц 2D',d:120,p:2000,w:3},
-    {n:'Дизайн (за ноготь)',d:10,p:100,w:0}
-  ];
-}
-function seedSrv(){
-  if(services().length&&!confirm('Добавить типовой прайс к тому, что уже есть?'))return;
-  D.config.services=services().concat(defaultSrv());
-  D.cfgUpd=Date.now();D.cfgDirty=1;save();renderSrv();
-}
 function renderSrv(){
   var L=services(),el=document.getElementById('srvList');
-  if(!L.length){el.innerHTML='<div class="empty">Прайс пуст. Добавьте услуги — их можно будет ставить в запись одним касанием.</div>';return}
+  if(!L.length){el.innerHTML='<div class="empty">Прайс пуст. Нажмите «+ Услуга» выше и добавьте первую — дальше так же по одной.</div>';return}
   el.innerHTML=L.map(function(x,i){
     return '<div class="row" onclick="openSrv('+i+')" style="cursor:pointer">'+
       '<div class="grow"><div class="nm">'+esc(x.n)+'</div>'+
