@@ -259,6 +259,21 @@ function loadShop(){
     })
     .catch(function(){document.getElementById('infoBlock').innerHTML='<div>Нет связи. Проверьте интернет.</div>'});
 }
+/* Мастер могла тем временем поставить/снять выходной, добавить окно или принять
+   другую запись — без этого страница держала бы состояние на момент открытия. */
+function refreshBoard(){
+  if(!SHOP)return;
+  fetch(BASE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({board:true,shop:SHOP})})
+    .then(function(r){return r.json()})
+    .then(function(res){
+      if(!res||!res.ok)return;
+      info=res.info||{};busy=res.busy||[];
+      renderShopHeader();renderMine();
+      if(document.getElementById('stepSrv').style.display!=='none')renderServices();
+      if(selSrv&&document.getElementById('stepTime').style.display!=='none')renderSlots();
+    })
+    .catch(function(){});
+}
 function renderShopHeader(){
   document.getElementById('shopName').textContent=info.name||'Студия';
   document.getElementById('shopSub').textContent=info.spec||'запись онлайн';
@@ -442,6 +457,8 @@ if(SHOP){
   document.getElementById('backToPicker').style.display='inline-block';
   document.getElementById('shopView').style.display='block';
   loadShop();
+  setInterval(function(){if(!document.hidden)refreshBoard()},20000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshBoard()});
 }else{
   loadPicker();
 }
