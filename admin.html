@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Кабинеты — админка</title>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<style>
+:root{
+  --ink:#2E1F26;--ink-2:#6B4F58;--ink-3:#9C838A;
+  --paper:#F6EDE9;--card:#FFFFFF;--line:#E9D9D9;
+  --acc:#8C2F45;--acc-bg:#F5DFE3;
+  --grn:#3F7355;--grn-bg:#E1EFE6;
+  --red:#A33B3B;--red-bg:#F8E4E4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+.wrap{max-width:920px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:22px;margin-bottom:4px}
+.sub{color:var(--ink-2);font-size:13px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px}
+.pad{padding:20px}
+.gate{max-width:360px;margin:60px auto}
+.gate input{width:100%;font:inherit;font-size:15px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+.gate button,.bar button{font:inherit;font-size:14px;font-weight:700;padding:10px 16px;border-radius:10px;border:none;background:var(--acc);color:#fff;cursor:pointer}
+.err{color:var(--red);font-size:13px;margin-bottom:10px;display:none}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.bar b{margin-right:auto;font-size:13px;color:var(--ink-2);font-weight:400}
+.bar button.ghost{background:none;color:var(--acc);border:1px solid var(--acc);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);font-weight:700}
+tr:last-child td{border-bottom:none}
+.nm{font-weight:700}
+.dim{color:var(--ink-2);font-size:12.5px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.p-ok{background:var(--grn-bg);color:var(--grn)}
+.p-off{background:var(--red-bg);color:var(--red)}
+a.open{color:var(--acc);font-weight:700;text-decoration:none;font-size:13px;white-space:nowrap}
+.empty{padding:40px;text-align:center;color:var(--ink-3)}
+.tblwrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="gate" id="gate">
+  <h1>Кабинеты</h1>
+  <p class="sub">Доступ только по ключу разработчика.</p>
+  <div class="card pad">
+    <div class="err" id="gateErr"></div>
+    <input id="keyInput" type="password" placeholder="Ключ доступа" autocomplete="off">
+    <button onclick="login()" style="width:100%">Войти</button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="bar">
+    <h1 style="margin-right:auto">Кабинеты салонов</h1>
+    <b id="asOf"></b>
+    <button class="ghost" onclick="load()">Обновить</button>
+    <button class="ghost" onclick="logout()">Выйти</button>
+  </div>
+  <div class="card">
+    <div class="tblwrap" id="listWrap"><div class="empty">Загрузка…</div></div>
+  </div>
+</div>
+
+</div>
+<script>
+var BASE_URL='https://dsmdmjpavpdxnmwprhng.supabase.co/functions/v1/admin';
+var LKEY='zk_admin_key';
+
+function esc(s){return String(s==null?'':s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+function fmtDate(ms){
+  if(!ms)return '—';
+  var d=new Date(ms);
+  return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+}
+
+function login(){
+  var key=document.getElementById('keyInput').value.trim();
+  var e=document.getElementById('gateErr');
+  if(!key){e.textContent='Введите ключ.';e.style.display='block';return}
+  fetchList(key).then(function(res){
+    if(!res.ok){e.textContent=res.error||'Неверный ключ.';e.style.display='block';return}
+    try{localStorage.setItem(LKEY,key)}catch(err){}
+    e.style.display='none';
+    document.getElementById('gate').style.display='none';
+    document.getElementById('app').style.display='block';
+    render(res.studios,res.time);
+  }).catch(function(){e.textContent='Нет связи с сервером.';e.style.display='block'});
+}
+function logout(){
+  try{localStorage.removeItem(LKEY)}catch(err){}
+  document.getElementById('app').style.display='none';
+  document.getElementById('gate').style.display='block';
+  document.getElementById('keyInput').value='';
+}
+function fetchList(key){
+  return fetch(BASE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:key})})
+    .then(function(r){return r.json()});
+}
+function load(){
+  var key=null;
+  try{key=localStorage.getItem(LKEY)}catch(err){}
+  if(!key)return;
+  document.getElementById('listWrap').innerHTML='<div class="empty">Загрузка…</div>';
+  fetchList(key).then(function(res){
+    if(!res.ok){logout();return}
+    render(res.studios,res.time);
+  }).catch(function(){document.getElementById('listWrap').innerHTML='<div class="empty">Нет связи с сервером.</div>'});
+}
+function render(list,time){
+  document.getElementById('asOf').textContent='обновлено '+fmtDate(time);
+  var el=document.getElementById('listWrap');
+  if(!list||!list.length){el.innerHTML='<div class="empty">Пока нет ни одного кабинета.</div>';return}
+  el.innerHTML='<table><tr>'+
+    '<th>Студия</th><th>Село</th><th>Телефон</th><th>Услуг</th><th>Записей</th><th>Обновлено</th><th>Статус</th><th></th>'+
+    '</tr>'+list.map(function(s){
+    return '<tr>'+
+      '<td><div class="nm">'+esc(s.name||s.id)+'</div><div class="dim">'+esc(s.master||'')+(s.spec?' · '+esc(s.spec):'')+'</div><div class="dim">логин: '+esc(s.id)+'</div></td>'+
+      '<td>'+esc(s.village||'—')+'</td>'+
+      '<td>'+(s.phone?'<a class="open" href="tel:'+esc(s.phone)+'">'+esc(s.phone)+'</a>':'—')+'</td>'+
+      '<td>'+s.services+'</td>'+
+      '<td>'+s.visitsTotal+'<div class="dim">'+s.visitsUpcoming+' предстоящих</div></td>'+
+      '<td>'+fmtDate(s.updated)+'</td>'+
+      '<td><span class="pill '+(s.deleted?'p-off':'p-ok')+'">'+(s.deleted?'удалён':'активен')+'</span></td>'+
+      '<td><a class="open" href="index.html?m='+encodeURIComponent(s.id)+'" target="_blank">страница ›</a></td>'+
+      '</tr>';
+  }).join('')+'</table>';
+}
+
+(function(){
+  var key=null;
+  try{key=localStorage.getItem(LKEY)}catch(err){}
+  if(key){
+    fetchList(key).then(function(res){
+      if(res.ok){
+        document.getElementById('gate').style.display='none';
+        document.getElementById('app').style.display='block';
+        render(res.studios,res.time);
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
