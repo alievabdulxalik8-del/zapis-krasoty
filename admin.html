@@ -40,6 +40,10 @@ tr:last-child td{border-bottom:none}
 a.open{color:var(--acc);font-weight:700;text-decoration:none;font-size:13px;white-space:nowrap}
 .empty{padding:40px;text-align:center;color:var(--ink-3)}
 .tblwrap{overflow-x:auto}
+.acts{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.rowbtn{font:inherit;font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:8px;cursor:pointer;white-space:nowrap;border:1px solid var(--red);background:none;color:var(--red)}
+.rowbtn.restore{border-color:var(--grn);color:var(--grn)}
+.rowbtn:disabled{opacity:.5;cursor:default}
 </style>
 </head>
 <body>
@@ -73,6 +77,9 @@ var BASE_URL='https://dsmdmjpavpdxnmwprhng.supabase.co/functions/v1/admin';
 var LKEY='zk_admin_key';
 
 function esc(s){return String(s==null?'':s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
+/* Безопасная вставка значения как аргумента-строки внутри onclick="fn('...')":
+   сначала экранируем \ и ' для JS-строки, затем esc() экранирует HTML-атрибут. */
+function attrJs(s){return esc(String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"))}
 function fmtDate(ms){
   if(!ms)return '—';
   var d=new Date(ms);
@@ -98,9 +105,22 @@ function logout(){
   document.getElementById('gate').style.display='block';
   document.getElementById('keyInput').value='';
 }
-function fetchList(key){
-  return fetch(BASE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:key})})
+function fetchList(key,extra){
+  var body=Object.assign({key:key},extra||{});
+  return fetch(BASE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
     .then(function(r){return r.json()});
+}
+function curKey(){try{return localStorage.getItem(LKEY)}catch(err){return null}}
+function doAction(id,action,label){
+  var key=curKey();if(!key)return;
+  var msg=action==='delete'
+    ?'Удалить кабинет «'+label+'»? Она не сможет войти и клиенты не смогут записаться, но данные не сотрутся — кабинет можно будет восстановить здесь же.'
+    :'Восстановить кабинет «'+label+'»?';
+  if(!confirm(msg))return;
+  fetchList(key,{action:action,id:id}).then(function(res){
+    if(!res.ok){alert(res.error||'Не получилось');return}
+    render(res.studios,res.time);
+  }).catch(function(){alert('Нет связи с сервером.')});
 }
 function load(){
   var key=null;
@@ -117,8 +137,9 @@ function render(list,time){
   var el=document.getElementById('listWrap');
   if(!list||!list.length){el.innerHTML='<div class="empty">Пока нет ни одного кабинета.</div>';return}
   el.innerHTML='<table><tr>'+
-    '<th>Студия</th><th>Село</th><th>Телефон</th><th>Услуг</th><th>Записей</th><th>Обновлено</th><th>Статус</th><th></th>'+
+    '<th>Студия</th><th>Село</th><th>Телефон</th><th>Услуг</th><th>Записей</th><th>Обновлено</th><th>Статус</th><th></th><th></th>'+
     '</tr>'+list.map(function(s){
+    var idJs=attrJs(s.id),lblJs=attrJs(s.name||s.id);
     return '<tr>'+
       '<td><div class="nm">'+esc(s.name||s.id)+'</div><div class="dim">'+esc(s.master||'')+(s.spec?' · '+esc(s.spec):'')+'</div><div class="dim">логин: '+esc(s.id)+'</div></td>'+
       '<td>'+esc(s.village||'—')+'</td>'+
@@ -128,6 +149,9 @@ function render(list,time){
       '<td>'+fmtDate(s.updated)+'</td>'+
       '<td><span class="pill '+(s.deleted?'p-off':'p-ok')+'">'+(s.deleted?'удалён':'активен')+'</span></td>'+
       '<td><a class="open" href="index.html?m='+encodeURIComponent(s.id)+'" target="_blank">страница ›</a></td>'+
+      '<td><div class="acts">'+(s.deleted
+        ?'<button class="rowbtn restore" onclick="doAction(\''+idJs+'\',\'restore\',\''+lblJs+'\')">Восстановить</button>'
+        :'<button class="rowbtn" onclick="doAction(\''+idJs+'\',\'delete\',\''+lblJs+'\')">Удалить</button>')+'</div></td>'+
       '</tr>';
   }).join('')+'</table>';
 }
