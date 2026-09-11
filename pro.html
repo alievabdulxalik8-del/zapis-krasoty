@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ЗаписьКрасоты для мастеров — запись клиентов без звонков</title>
+<meta name="description" content="Клиентки сами выбирают время онлайн, вы видите запись в кабинете. Без звонков, без путаницы в личных сообщениях. Первые 2 недели бесплатно.">
+<meta property="og:title" content="ЗаписьКрасоты — онлайн-запись для мастера красоты">
+<meta property="og:description" content="Клиентки сами выбирают время, вы видите запись в кабинете. Без звонков и путаницы. Первые 2 недели бесплатно.">
+<meta name="theme-color" content="#8C2F45">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Infant:wght@600;700&family=Manrope:wght@400;500;700;800&display=swap">
+<style>
+:root{
+  --ink:#2E1F26;--ink-2:#6B4F58;--ink-3:#9C838A;
+  --paper:#F6EDE9;--card:#FFFFFF;--line:#E9D9D9;
+  --acc:#8C2F45;--acc-bg:#F5DFE3;
+  --grn:#3F7355;--grn-bg:#E1EFE6;
+  --r:16px;--disp:'Cormorant Infant',Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);font-size:16px;line-height:1.55}
+.wrap{max-width:600px;margin:0 auto;padding:0 20px}
+section{padding:44px 0}
+h1,h2{font-family:var(--disp);font-weight:600;line-height:1.15;color:var(--ink)}
+h1{font-size:34px;margin-bottom:14px}
+h2{font-size:26px;margin-bottom:18px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.lead{font-size:16px;color:var(--ink-2);margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;font:inherit;font-size:17px;font-weight:700;
+  padding:16px 20px;border-radius:14px;border:none;background:var(--acc);color:#fff;text-decoration:none;cursor:pointer;
+  box-shadow:0 10px 24px rgba(140,47,69,.28)}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:none;color:var(--acc);box-shadow:none;border:1.5px solid var(--acc)}
+.fine{font-size:13px;color:var(--ink-3);text-align:center;margin-top:10px}
+.hero{padding:56px 0 40px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-120px;right:-100px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(140,47,69,.14),rgba(140,47,69,0) 70%)}
+.hero::after{content:'';position:absolute;bottom:-140px;left:-110px;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(140,47,69,.10),rgba(140,47,69,0) 70%)}
+.hero .inner{position:relative}
+.badge{display:inline-block;font-size:12.5px;font-weight:700;color:var(--acc);background:var(--acc-bg);padding:6px 14px;border-radius:20px;margin-bottom:18px}
+.hero h1{font-size:38px}
+.hero .lead{font-size:17px;max-width:440px;margin-left:auto;margin-right:auto}
+.problems{display:flex;flex-direction:column;gap:12px}
+.problem{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.problem .ico{flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:var(--acc-bg);color:var(--acc);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--disp);font-size:16px}
+.problem p{font-size:15px;color:var(--ink-2)}
+.steps{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step .num{flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:var(--acc);color:#fff;font-family:var(--disp);
+  font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center}
+.step h3{font-size:16px;font-weight:800;margin-bottom:3px}
+.step p{font-size:14.5px;color:var(--ink-2)}
+.shots{display:flex;gap:14px;overflow-x:auto;padding:4px 4px 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+.shot{flex:0 0 auto;width:220px;scroll-snap-align:start}
+.shot .frame{border:8px solid var(--card);border-radius:22px;overflow:hidden;box-shadow:0 16px 34px rgba(46,31,38,.18);background:var(--card)}
+.shot img{display:block;width:100%;height:340px;object-fit:cover;object-position:top}
+.shot .cap{text-align:center;font-size:12.5px;color:var(--ink-3);margin-top:8px}
+.perks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.perk{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.perk .ico{font-size:20px;margin-bottom:8px}
+.perk b{display:block;font-size:14.5px;margin-bottom:3px}
+.perk span{font-size:13px;color:var(--ink-2)}
+.price-card{background:linear-gradient(160deg,#FFFFFF 0%,var(--acc-bg) 130%);border:1.5px solid var(--acc);border-radius:20px;padding:28px 24px;text-align:center}
+.price-card .free{font-family:var(--disp);font-size:22px;font-weight:600;color:var(--grn);margin-bottom:4px}
+.price-card .then{font-size:14px;color:var(--ink-2);margin-bottom:18px}
+.price-card .price{font-family:var(--disp);font-size:44px;font-weight:700;color:var(--ink);line-height:1}
+.price-card .price sub{font-family:'Manrope',sans-serif;font-size:15px;font-weight:600;color:var(--ink-2)}
+.incl{text-align:left;list-style:none;margin:20px 0 22px;display:flex;flex-direction:column;gap:9px}
+.incl li{display:flex;gap:9px;font-size:14.5px;color:var(--ink)}
+.incl li::before{content:'✓';color:var(--grn);font-weight:800;flex:0 0 auto}
+.proof{background:var(--acc-bg);border-radius:16px;padding:22px;text-align:center}
+.proof p{font-size:15px;color:var(--ink);font-weight:600}
+.proof span{display:block;margin-top:6px;font-size:13px;color:var(--ink-2);font-weight:400}
+footer{padding:32px 0 44px;text-align:center}
+footer a{color:var(--acc);text-decoration:none;font-size:13px;font-weight:700}
+footer .sep{color:var(--ink-3);margin:0 8px}
+@media(min-width:640px){
+  .hero h1{font-size:44px}
+  .price-card .price{font-size:52px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap hero">
+  <div class="inner">
+    <span class="badge">Для мастеров маникюра, бровей и ресниц</span>
+    <h1>Запись клиентов — без звонков и путаницы</h1>
+    <p class="lead">Клиентки сами выбирают удобное время на телефоне, а вы просто открываете кабинет и видите, кто и когда придёт. Ничего не нужно устанавливать — работает прямо в браузере.</p>
+    <a class="btn" href="https://wa.me/78997960644?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B8%D1%82%D1%8C%20%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D1%8C%D0%9A%D1%80%D0%B0%D1%81%D0%BE%D1%82%D1%8B" target="_blank" rel="noopener">Написать в WhatsApp</a>
+    <p class="fine">Первые 2 недели — бесплатно</p>
+  </div>
+</div>
+
+<div class="wrap">
+<section id="problem">
+  <div class="eyebrow">Знакомо?</div>
+  <h2>Без системы записи всё держится на памяти</h2>
+  <div class="problems">
+    <div class="problem"><div class="ico">✕</div><p>Клиентки пишут в личные сообщения в разное время — записи путаются, а что-то теряется совсем</p></div>
+    <div class="problem"><div class="ico">✕</div><p>Случайно записали двух человек на одно и то же время — и одной из них приходится отказывать</p></div>
+    <div class="problem"><div class="ico">✕</div><p>Забыли перезвонить клиентке вовремя — а она уже записалась к другому мастеру</p></div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="eyebrow">Как это работает</div>
+  <h2>Три шага — и порядок в записи</h2>
+  <div class="steps">
+    <div class="step"><div class="num">1</div><div><h3>Клиентка выбирает время сама</h3><p>Открывает вашу ссылку, выбирает услугу и удобный день — прямо с телефона, без звонка вам</p></div></div>
+    <div class="step"><div class="num">2</div><div><h3>Запись сразу в кабинете</h3><p>Имя, телефон, услуга и время — уже ждут вас в кабинете, ничего переписывать не нужно</p></div></div>
+    <div class="step"><div class="num">3</div><div><h3>Готово</h3><p>Никаких звонков, бумажек и «а на когда я вас записала?» — всё видно на телефоне</p></div></div>
+  </div>
+  <div class="shots">
+    <div class="shot"><div class="frame"><img src="pro-assets/shot-client.png" alt="Клиентка выбирает время записи"></div><p class="cap">страница записи для клиентки</p></div>
+    <div class="shot"><div class="frame"><img src="pro-assets/shot-master.png" alt="Кабинет мастера со списком записей"></div><p class="cap">кабинет мастера — список записей</p></div>
+  </div>
+</section>
+
+<section id="perks">
+  <div class="eyebrow">Что внутри</div>
+  <h2>Всё нужное, без лишнего</h2>
+  <div class="perks">
+    <div class="perk"><div class="ico">📱</div><b>С любого телефона</b><span>Ничего не нужно устанавливать — открывается в браузере</span></div>
+    <div class="perk"><div class="ico">🔗</div><b>Своя ссылка на запись</b><span>Киньте в сторис, профиль или закреп — и клиентки сами запишутся</span></div>
+    <div class="perk"><div class="ico">🗓️</div><b>Свои окошки на день</b><span>Сами решаете, когда работаете — клиентки видят только это время</span></div>
+    <div class="perk"><div class="ico">🌸</div><b>Можно поставить выходной</b><span>Клиентки сразу увидят, что сегодня вы не работаете</span></div>
+    <div class="perk"><div class="ico">🔔</div><b>Уведомление о записи</b><span>Сигнал на телефон, как только кто-то записался</span></div>
+    <div class="perk"><div class="ico">💇🏻‍♀️</div><b>База клиенток</b><span>История визитов — видно, кто когда был и на что записывался</span></div>
+  </div>
+</section>
+
+<section id="price">
+  <div class="eyebrow">Тариф</div>
+  <h2>Один простой тариф</h2>
+  <div class="price-card">
+    <div class="free">Первые 2 недели — бесплатно</div>
+    <div class="then">попробуйте без риска, отменить можно в любой момент</div>
+    <div class="price">499 ₽<sub> / месяц</sub></div>
+    <ul class="incl">
+      <li>Своя страница записи для клиенток</li>
+      <li>Кабинет мастера со всеми записями</li>
+      <li>Окна, выходные и напоминания</li>
+      <li>База клиенток и история визитов</li>
+      <li>Push-уведомления о новых записях</li>
+    </ul>
+    <a class="btn" href="https://wa.me/78997960644?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B8%D1%82%D1%8C%20%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D1%8C%D0%9A%D1%80%D0%B0%D1%81%D0%BE%D1%82%D1%8B" target="_blank" rel="noopener">Попробовать бесплатно</a>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="proof">
+    <p>Сервисом уже пользуются мастера в Акуше</p>
+    <span>Присоединяйтесь и вы — подключение занимает пару минут</span>
+  </div>
+</section>
+
+<section id="cta" style="text-align:center">
+  <h2>Готовы навести порядок в записи?</h2>
+  <p class="lead">Напишите — расскажем и подключим за пару минут. Или зарегистрируйтесь сами прямо сейчас.</p>
+  <a class="btn" href="https://wa.me/78997960644?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B8%D1%82%D1%8C%20%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D1%8C%D0%9A%D1%80%D0%B0%D1%81%D0%BE%D1%82%D1%8B" target="_blank" rel="noopener">Написать в WhatsApp</a>
+  <div style="height:10px"></div>
+  <a class="btn ghost" href="app.html">Уже решили? Зарегистрироваться в кабинете</a>
+</section>
+</div>
+
+<footer>
+  <a href="index.html">Каталог мастеров</a><span class="sep">·</span><a href="start.html">Как это работает</a><span class="sep">·</span><a href="privacy.html">Политика конфиденциальности</a>
+</footer>
+
+</body>
+</html>
